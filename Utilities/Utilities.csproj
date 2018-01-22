@@ -85,9 +85,6 @@
     <Compile Include="WindowsAPI\User32API.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\NLogger\NLogger.csproj">
       <Project>{2055C0D2-9E61-410D-B3B1-EA843E1C851F}</Project>
       <Name>NLogger</Name>
