@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Utilities.Common;
 using Utilities.WindowsAPI;
 
 namespace Utilities
@@ -79,6 +80,37 @@ namespace Utilities
                 NativeFileAPI.SetThreadExecutionState(NativeFileAPI.ES_CONTINUOUS | NativeFileAPI.ES_SYSTEM_REQUIRED);
             else
                 NativeFileAPI.SetThreadExecutionState(NativeFileAPI.ES_CONTINUOUS);
+        }
+
+        public static string BrowseFolder(string description, string selectedPath, System.Windows.Interop.HwndSource source)
+        {
+            string folderPath = string.Empty;
+            try
+            {
+                Environment.SpecialFolder rootFolder = Environment.SpecialFolder.Desktop;
+
+                System.Windows.Forms.FolderBrowserDialog folderBrowser = new System.Windows.Forms.FolderBrowserDialog();
+                folderBrowser.Description = description;
+                folderBrowser.RootFolder = rootFolder;
+                folderBrowser.SelectedPath = selectedPath;
+                System.Windows.Forms.IWin32Window iWin32Window = new ShellWin32Window(source);
+
+                System.Windows.Forms.DialogResult result = folderBrowser.ShowDialog(iWin32Window);
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    folderPath = folderBrowser.SelectedPath;
+                }
+                
+            }
+            catch (System.Exception ex)
+            {
+                folderPath = null;
+                LogHelper.UILogger.Debug("BrowseFolder Failed,", ex);
+            }
+            finally
+            {
+            }
+            return folderPath;
         }
     }
 }

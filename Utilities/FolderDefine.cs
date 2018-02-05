@@ -11,7 +11,18 @@ namespace Utilities
 {
     public class FolderDefine
     {
-        static FolderDefine()
+        public static FolderDefine Instance
+        {
+            get { return Nested.instance; }
+        }
+
+        class Nested
+        {
+            static Nested() { }
+            internal static readonly FolderDefine instance = new FolderDefine();
+        }
+
+        FolderDefine()
         {
             try
             {
@@ -30,22 +41,36 @@ namespace Utilities
             }
         }
 
-        private static string productName = "Media Center";
-        public static string ProductName
+        public void Init(string companyName, string productName)
         {
-            get { return FolderDefine.productName; }
+            this.companyName = companyName;
+            if (!string.IsNullOrEmpty(productName))
+            {
+                this.productName = productName;
+            }
         }
 
-        private static string companyName = "Eric";
-
-        public static string CompanyName
+        public void Uninit()
         {
-            get { return FolderDefine.companyName; }
+        }
+        
+
+        private string productName = string.Empty;
+        public string ProductName
+        {
+            get { return this.productName; }
         }
 
-        private static string companyDataFolder;
+        private string companyName = string.Empty;
 
-        public static string CompanyDataFolder
+        public string CompanyName
+        {
+            get { return this.companyName; }
+        }
+
+        private string companyDataFolder;
+
+        public string CompanyDataFolder
         {
             get
             {
@@ -77,9 +102,9 @@ namespace Utilities
             }
         }
 
-        private static string userDataFolder;
+        private string userDataFolder;
 
-        public static string UserDataFolder
+        public string UserDataFolder
         {
             get
             {
@@ -97,9 +122,9 @@ namespace Utilities
             }
         }
 
-        private static string databaseFolder;
+        private string databaseFolder;
 
-        public static string DatabaseFolder
+        public string DatabaseFolder
         {
             get
             {
@@ -115,9 +140,9 @@ namespace Utilities
             }
         }
 
-        private static string tempFolder;
+        private string tempFolder;
 
-        public static string TempFolder
+        public string TempFolder
         {
             get
             {
@@ -129,7 +154,7 @@ namespace Utilities
             }
         }
 
-        private static string GetTempFolder(bool isCreate)
+        private string GetTempFolder(bool isCreate)
         {
             string tempFolder = Path.Combine(UserDataFolder, "temp");
             if (isCreate)
@@ -142,7 +167,7 @@ namespace Utilities
             return tempFolder;
         }
 
-        public static void CleanTempFolder()
+        public void CleanTempFolder()
         {
             string tmpFolder = GetTempFolder(false);
             if (Directory.Exists(tmpFolder))
