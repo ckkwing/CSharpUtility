@@ -81,6 +81,7 @@
     <Compile Include="Settings\LanguageSetting.cs" />
     <Compile Include="StandardFileExtensions.cs" />
     <Compile Include="StringConstant.cs" />
+    <Compile Include="ThreadHelper.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="WebHelper.cs" />
     <Compile Include="WindowsAPI\NativeFileAPI.cs" />
