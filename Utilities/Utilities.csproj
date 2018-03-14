@@ -67,11 +67,6 @@
     <Compile Include="CastHelper.cs" />
     <Compile Include="Common\ResourceProvider.cs" />
     <Compile Include="Common\ShellWin32Window.cs" />
-    <Compile Include="Converter\BoolToVisibilityCollapseConverter.cs" />
-    <Compile Include="Converter\ObjectToBoolConverter.cs" />
-    <Compile Include="Converter\ObjectToVisibilityConverter.cs" />
-    <Compile Include="Converter\SelectedItemDisplayConverter.cs" />
-    <Compile Include="Converter\WidthAndHeightToRectConverter.cs" />
     <Compile Include="EnumHelper.cs" />
     <Compile Include="Extension\CommonExtension.cs" />
     <Compile Include="Extension\ResizableExtention.cs" />
