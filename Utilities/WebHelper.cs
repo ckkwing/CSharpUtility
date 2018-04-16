@@ -5,12 +5,17 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Cache;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Web;
+using Utilities.Extension;
 
 namespace Utilities
 {
     public class WebHelper
     {
+        private readonly static string CONTENTTYPE_DEFAULT = "application/x-www-form-urlencoded";
         public class DownloadEntity
         {
             public long TotalSize { get; set; }
@@ -299,6 +304,117 @@ namespace Utilities
             }
 
             return isSucceed;
+        }
+
+        public static void AppendHTTPParameter(string key, string value, ref string content, string separator = "&")
+        {
+            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
+                return;
+            if (!string.IsNullOrEmpty(content))
+                content += separator;
+
+            content += string.Format("{0}={1}", HttpUtility.UrlEncode(key, Encoding.UTF8), HttpUtility.UrlEncode(value, Encoding.UTF8));
+        }
+
+        public static void AppendHTTPParameter(string key, string value, ref StringBuilder content, string separator = "&")
+        {
+            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
+                return;
+            if (content.Length > 0)
+                content.AppendFormat(@"{0}", separator);
+
+            content.AppendFormat("{0}={1}", HttpUtility.UrlEncode(key, Encoding.UTF8), HttpUtility.UrlEncode(value, Encoding.UTF8));
+        }
+
+        public static HttpWebResponse CreatePostHttpResponse(string url, IDictionary<string, string> parameters, Encoding requestEncoding, Dictionary<string, string> headers = null, int? timeout = 100000)
+        {
+            byte[] data = null;
+            if (!(parameters == null || parameters.Count == 0))
+            {
+                StringBuilder buffer = new StringBuilder();
+                int i = 0;
+                foreach (string key in parameters.Keys)
+                {
+                    if (i > 0)
+                    {
+                        buffer.AppendFormat("&{0}={1}", key, parameters[key]);
+                    }
+                    else
+                    {
+                        buffer.AppendFormat("{0}={1}", key, parameters[key]);
+                    }
+                    i++;
+                }
+                data = requestEncoding.GetBytes(buffer.ToString());
+            }
+
+            return CreatePostHttpResponse(url, data, requestEncoding, headers, timeout);
+        }
+
+        public static HttpWebResponse CreatePostHttpResponse(string url, string postData, Encoding requestEncoding, Dictionary<string, string> headers = null, int? timeout = 100000)
+        {
+            byte[] data = requestEncoding.GetBytes(postData);
+            return CreatePostHttpResponse(url, data, requestEncoding, headers, timeout);
+        }
+
+        public static HttpWebResponse CreatePostHttpResponse(string url, byte[] postData, Encoding requestEncoding, Dictionary<string, string> headers = null, int? timeout = 100000)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentNullException("url");
+            }
+
+            if (postData.IsNull())
+            {
+                throw new ArgumentNullException("postData");
+            }
+
+            if (requestEncoding == null)
+            {
+                throw new ArgumentNullException("requestEncoding");
+            }
+            HttpWebRequest request = null;
+
+            if (url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+            {
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                request = WebRequest.Create(url) as HttpWebRequest;
+                request.ProtocolVersion = HttpVersion.Version10;
+            }
+            else
+            {
+                request = WebRequest.Create(url) as HttpWebRequest;
+            }
+
+            if (headers != null)
+            {
+                foreach (string key in headers.Keys)
+                {
+                    request.Headers.Add(key, headers[key]);
+                }
+            }
+
+            request.Method = "POST";
+            request.ContentType = CONTENTTYPE_DEFAULT;
+
+            if (timeout.HasValue)
+            {
+                request.Timeout = timeout.Value;
+            }
+
+            if (!postData.IsNull())
+            {
+                using (Stream stream = request.GetRequestStream())
+                {
+                    stream.Write(postData, 0, postData.Length);
+                }
+            }
+            return request.GetResponse() as HttpWebResponse;
+        }
+
+        private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
+        {
+            return true;
         }
     }
 }
