@@ -68,6 +68,7 @@
     <Compile Include="CastHelper.cs" />
     <Compile Include="Common\ResourceProvider.cs" />
     <Compile Include="Common\ShellWin32Window.cs" />
+    <Compile Include="DependencyHelper\StateManager.cs" />
     <Compile Include="EnumHelper.cs" />
     <Compile Include="Extension\CommonExtension.cs" />
     <Compile Include="Extension\ResizableExtention.cs" />
